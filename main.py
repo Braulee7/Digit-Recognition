@@ -13,7 +13,6 @@ class main:
         self.old_x = None
         self.old_y = None
         self.penwidth = 25
-        self.prediction = -1
         self.drawWidgets()
         self.c.bind('<B1-Motion>',self.paint)#drwaing the line 
         self.c.bind('<ButtonRelease-1>',self.reset)
@@ -24,6 +23,7 @@ class main:
         
 
     def paint(self,e):
+        #draw on tkinter canvas and PIL canvas to get image
         if self.old_x and self.old_y:
             self.c.create_line(self.old_x,self.old_y,e.x,e.y,width=self.penwidth,fill=self.color_fg,capstyle=ROUND,smooth=True)
             self.draw.line([(self.old_x, self.old_y), (e.x, e.y)], fill='white', width=self.penwidth)
@@ -36,10 +36,7 @@ class main:
         self.old_y = None  
         
 
-    def changeW(self,e): #change Width of pen through slider
-        self.penwidth = e
-
-
+    #draw all widgets to tkinter root
     def drawWidgets(self):
         self.saveBtn = Button(self.master, text='Check Prediction', command=self.save)
         self.c = Canvas(self.master,width=280,height=280,bg=self.color_bg,)
@@ -50,20 +47,13 @@ class main:
 
 
 
-    #save file as an jpg
+    #save file as an jpg and get prediction
     def save(self, e=None):
-        # x = self.master.winfo_rootx()+self.c.winfo_x() - 5
-        # y = self.master.winfo_rooty()+self.c.winfo_y() - 5
-        # x1 = x + self.c.winfo_width() 
-        # y1 = y + self.c.winfo_height() 
-        # ImageGrab.grab().crop((x,y,x1,y1)).save("image.jpg")
-        # print('saved image')
-        
         self.image1.save('image.jpg')
         self.draw.rectangle([0, 0, 500, 500], outline='black', fill='black')
 
+        #get prediction and present to user
         self.prediction = self.model.Predict('image.jpg')    
-        print(self.prediction)
         
         if self.labelDir is not None:
             self.labelDir.destroy()

@@ -9,7 +9,7 @@ import os
 keras = tf.keras
 root_log = os.path.join(os.curdir, 'tensorboard_logs')
 
-def get_sub():
+def get_sub(): #get sub directory for tensorboard logs
     run_id = time.strftime("run_%Y_%m_%d-%H_%M_%S")
     return os.path.join(root_log, run_id)
 
@@ -25,7 +25,7 @@ def get_data():
 
     return x_train_full, y_train_full, x_valid, y_valid, x_test, y_test
 
-#build neural network
+#build neural network with n hidden layers and n neurons per layer
 def build(hidden=1, neurons=30, learning_rate=3e-3, input_shape=[28, 28]):
     model = keras.models.Sequential()
 
@@ -42,7 +42,7 @@ def build(hidden=1, neurons=30, learning_rate=3e-3, input_shape=[28, 28]):
     model.compile(loss=keras.losses.SparseCategoricalCrossentropy(), optimizer=optimizer, metrics=['accuracy'])
     return model
 
-def train(model, X, Y, dir):
+def train(model, X, Y, dir): #train manually built model
     callback = keras.callbacks.TensorBoard(dir)
     history = model.fit(X, Y, batch_size=32 ,epochs=15, validation_split=0.1, callbacks=[callback, keras.callbacks.EarlyStopping(patience=10)])
     return history
@@ -51,6 +51,8 @@ def eval(model, X, Y):
     results = model.evaluate(X, Y, batch_size=128)
     return results
 
+#use randomised search to get the model with the best params
+#{'hidden': 3, 'learning_rate': 0.0033331276482504637, 'neurons': 25}
 def tune(X, Y, X_v, Y_v, dir):
     reg = keras.wrappers.scikit_learn.KerasRegressor(build)
 
@@ -72,28 +74,13 @@ def tune(X, Y, X_v, Y_v, dir):
 X_Tr, Y_Tr, X_v, Y_v, X_t, Y_t = get_data()
 dir = get_sub()
 
-#{'hidden': 3, 'learning_rate': 0.0033331276482504637, 'neurons': 25}
-#model = build(hidden=1, learning_rate=0.0033331276482504637, neurons=25)
 
-#hist = train(model, X_Tr, Y_Tr, dir)
-
-model = keras.models.load_model('hypertuned.h5')
+model = keras.models.load_model('run_2023_02_08-18_47_46.h5')
 
 results = eval(model, X_t, Y_t)
 
 print('loss, acc', results)
-print(X_t[3].shape)
-img = np.reshape(X_t[9], (-1, 28, 28))
 
-prediction = model.predict(img)
-# plt.imshow(img.reshape(28, 28), cmap=plt.cm.binary)
-# plt.title(np.argmax(prediction[0], axis=0))
-# plt.show()
-print(img)
-
-
-
-model.save('hypertuned_best_params.h5')
 
 
 

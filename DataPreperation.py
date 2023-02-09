@@ -13,7 +13,8 @@ class Prepare():
         #change pixel values to greyscale image
         self.gray = cv2.cvtColor(self.resized, cv2.COLOR_BGR2GRAY)
 
-    def getGrayScale(self):
+    #getter functions to get data
+    def getGrayScale(self): 
         self.gray = self.gray 
         print('img shape', self.gray.shape)
         return np.reshape(self.gray, (-1, 28, 28))
