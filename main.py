@@ -1,6 +1,7 @@
 from tkinter import *
-from PIL import ImageGrab
+from PIL import ImageGrab, Image, ImageDraw
 from Prediction import Model
+import os
 
 
 
@@ -11,18 +12,21 @@ class main:
         self.color_bg = 'black'
         self.old_x = None
         self.old_y = None
-        self.penwidth = 30
+        self.penwidth = 25
         self.prediction = -1
         self.drawWidgets()
         self.c.bind('<B1-Motion>',self.paint)#drwaing the line 
         self.c.bind('<ButtonRelease-1>',self.reset)
         self.model = Model()
         self.labelDir = None
+        self.image1 = Image.new('RGB', (280, 280), (0, 0, 0))
+        self.draw = ImageDraw.Draw(self.image1)
         
 
     def paint(self,e):
         if self.old_x and self.old_y:
             self.c.create_line(self.old_x,self.old_y,e.x,e.y,width=self.penwidth,fill=self.color_fg,capstyle=ROUND,smooth=True)
+            self.draw.line([(self.old_x, self.old_y), (e.x, e.y)], fill='white', width=self.penwidth)
 
         self.old_x = e.x
         self.old_y = e.y
@@ -39,7 +43,7 @@ class main:
     def drawWidgets(self):
         self.saveBtn = Button(self.master, text='Check Prediction', command=self.save)
         self.c = Canvas(self.master,width=280,height=280,bg=self.color_bg,)
-        self.c.pack(fill=BOTH, expand=True)
+        self.c.pack(expand=False)
         self.saveBtn.pack(side='top')
         self.clearBtn = Button(self.master, text='Clear', command=self.clear)
         self.clearBtn.pack(side='top')
@@ -48,12 +52,16 @@ class main:
 
     #save file as an jpg
     def save(self, e=None):
-        x = root.winfo_rootx()+self.c.winfo_x()
-        y = root.winfo_rooty()+self.c.winfo_y()
-        x1 = x + self.c.winfo_width()
-        y1 = y + self.c.winfo_height()
-        ImageGrab.grab().crop((x,y,x1,y1)).save("image.jpg")
-        print('saved image')
+        # x = self.master.winfo_rootx()+self.c.winfo_x() - 5
+        # y = self.master.winfo_rooty()+self.c.winfo_y() - 5
+        # x1 = x + self.c.winfo_width() 
+        # y1 = y + self.c.winfo_height() 
+        # ImageGrab.grab().crop((x,y,x1,y1)).save("image.jpg")
+        # print('saved image')
+        
+        self.image1.save('image.jpg')
+        self.draw.rectangle([0, 0, 500, 500], outline='black', fill='black')
+
         self.prediction = self.model.Predict('image.jpg')    
         print(self.prediction)
         

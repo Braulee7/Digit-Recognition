@@ -14,7 +14,8 @@ class Prepare():
         self.gray = cv2.cvtColor(self.resized, cv2.COLOR_BGR2GRAY)
 
     def getGrayScale(self):
-        self.gray = self.gray / 255.0
+        self.gray = self.gray 
+        print('img shape', self.gray.shape)
         return np.reshape(self.gray, (-1, 28, 28))
     
     def getDimensions(self):

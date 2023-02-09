@@ -1,2 +1,4 @@
 __pycache__
 *.jpg
+tensorboard_logs
+*.h5

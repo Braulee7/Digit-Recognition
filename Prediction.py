@@ -12,20 +12,20 @@ from DataPreperation import Prepare
 class Model():
     def __init__(self) -> None:
         self.model = keras.models.load_model(
-        'first_model.h5',
+        'hypertuned_best_params.h5',
         custom_objects=None, compile=False)
 
-        self.model.compile(loss='sparse_categorical_crossentropy',
-                optimizer="sgd",
-                metrics=["accuracy"])
+        optimizer = keras.optimizers.SGD(0.0033331276482504637)
+        self.model.compile(loss=keras.losses.SparseCategoricalCrossentropy(), optimizer=optimizer, metrics=['accuracy'])
 
     def Predict(self, img_path):
         img = cv2.imread(img_path, cv2.IMREAD_UNCHANGED)
         data = Prepare(img)
         img_prepared = data.getGrayScale()
         prediction = self.model.predict(img_prepared)
+        print(img_prepared.reshape(28, 28))
         # plt.imshow(img_prepared.reshape(28, 28), cmap=plt.cm.binary)
-        # plt.title(np.argmax(prediction, axis=0))
+        # plt.title(np.argmax(prediction[0], axis=0))
         # plt.show()
         return np.argmax(prediction[0], axis=0)
 
